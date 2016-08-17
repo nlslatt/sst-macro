@@ -75,6 +75,26 @@ DEF_BINARY_OP(|,o);
 DEF_BINARY_OP(&=,ae);
 DEF_BINARY_OP(|=,oe);
 
+template <typename T, typename N>
+struct func_memset {
+  void operator()(){ T a(10); memset(a, 0, 10*sizeof(N)); }
+};
+
+template <typename T, typename U, typename N>
+struct func_memcpy1 {
+  void operator()(){ T a(10); U b(10); memcpy(a, b, 10*sizeof(N)); }
+};
+
+template <typename T, typename U>
+struct func_memcpy2 {
+  void operator()(){ T a(10); U b[10]; memcpy(a, b, 10*sizeof(U)); }
+};
+
+template <typename T, typename U>
+struct func_memcpy3 {
+  void operator()(){ T a(10); U b[10]; const U *c = b; memcpy(a, c, 10*sizeof(U)); }
+};
+
 #define TEST_UNARY_POSTFIX_OP_NONCONST_DBL(OP,SYM) \
   verify_nops<unary_##SYM<Double>>("D" #OP,1);
 
@@ -137,6 +157,12 @@ int main(int argc, char** argv)
 
   TEST_BINARY_OP_NONCONST_DBL(&=,ae);
   TEST_BINARY_OP_NONCONST_DBL(|=,oe);
+
+  verify_nops<func_memset<DoublePtr,double>>("memset(D)",10);
+  verify_nops<func_memcpy1<DoublePtr,DoublePtr,double>>("memcpy(D,D)",10);
+  verify_nops<func_memcpy1<DoublePtr,const DoublePtr,double>>("memcpy(D,cD)",10);
+  verify_nops<func_memcpy2<DoublePtr,double>>("memcpy(D,d)",10);
+  verify_nops<func_memcpy3<DoublePtr,double>>("memcpy(D,cd)",10);
 
   MPI_Finalize();
 
