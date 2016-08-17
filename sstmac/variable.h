@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <cstddef>
 #include <sstmac/software/process/thread.h>
+#include <sstmac/software/process/operating_system.h>
 
 #define DECLARE_OPERATOR(op,CONST,REF) \
   template <class T, class U> \
