@@ -1,33 +1,150 @@
 #include <sstmac/util.h>
 #include <sstmac/variable.h>
 #include <sstmac/replacements/mpi.h>
-
-#define run_fxn(fxn, t_expected, ...) \
-{  \
-  double t_start, t_stop, t_total; \
-  t_start = MPI_Wtime(); \
-  fxn(__VA_ARGS__); \
-  t_stop = MPI_Wtime(); \
-  t_total = t_stop - t_start; \
-  if (int(t_expected-t_total) != 0) \
-    std::cerr << "FAILED: Function " #fxn " had unexpected number of flops.\n"; \
-  else \
-    std::cout << "SUCCESS: Function " #fxn " had expected number of flops.\n"; \
-}
-
-extern "C" int ubuntu_cant_name_mangle() { return 0; }
+#include <cmath>
 
 #define sstmac_app_name "test_variable"
 
-void op(){ Double a = 0, b = 0; a += b; }
+extern "C" int ubuntu_cant_name_mangle() { return 0; }
+
+// THIS TEST ONLY WORKS WITH PROCESSOR SPEED OF 1 HZ
+
+static int n_failures = 0;
+
+template <class op>
+bool
+verify_nops(const std::string &name, int nops_expected){
+  op o;
+  double t_start = MPI_Wtime();
+  o();
+  double t_stop = MPI_Wtime();
+  int nops_actual = round(t_stop - t_start);
+  bool success = (nops_expected == nops_actual);
+
+  if (success){
+    std::cout << "SUCCESS: " << name << " had expected number of operations.\n";
+  } else {
+    std::cerr << "FAILED: " << name << " recorded " << nops_actual
+              << " operation(s) when " << nops_expected
+              << " was expected.\n";
+    n_failures++;
+  }
+  return success;
+}
+
+#define DEF_UNARY_POSTFIX_OP(OP,SYM) \
+  template <typename T> \
+  struct unary_##SYM { void operator()(){ T a = 0; a OP; } };
+
+#define DEF_UNARY_PREFIX_OP(OP,SYM) \
+  template <typename T> \
+  struct unary_##SYM { void operator()(){ T a = 0; OP a; } };
+
+#define DEF_FUNC1(FUNC) \
+  template <typename T> \
+  struct func_##FUNC { void operator()(){ T a = 0; FUNC(a); } };
+
+#define DEF_BINARY_OP(OP,SYM) \
+  template <typename T, typename U> \
+  struct binary_##SYM { void operator()(){ T a = 0; U b = 0; a OP b; } };
+
+DEF_UNARY_POSTFIX_OP(++,ppr);
+DEF_UNARY_POSTFIX_OP(--,mmr);
+
+DEF_UNARY_PREFIX_OP(++,ppl);
+DEF_UNARY_PREFIX_OP(--,mml);
+DEF_UNARY_PREFIX_OP(-,ml);
+
+DEF_FUNC1(sqrt);
+DEF_FUNC1(cbrt);
+DEF_FUNC1(fabs);
+
+DEF_BINARY_OP(+,p);
+DEF_BINARY_OP(-,m);
+DEF_BINARY_OP(*,t);
+DEF_BINARY_OP(/,d);
+
+DEF_BINARY_OP(+=,pe);
+DEF_BINARY_OP(-=,me);
+DEF_BINARY_OP(*=,te);
+DEF_BINARY_OP(/=,de);
+
+DEF_BINARY_OP(&,a);
+DEF_BINARY_OP(|,o);
+
+DEF_BINARY_OP(&=,ae);
+DEF_BINARY_OP(|=,oe);
+
+#define TEST_UNARY_POSTFIX_OP_NONCONST_DBL(OP,SYM) \
+  verify_nops<unary_##SYM<Double>>("D" #OP,1);
+
+#define TEST_UNARY_PREFIX_OP_NONCONST_DBL(OP,SYM) \
+  verify_nops<unary_##SYM<Double>>(#OP "D",1);
+
+#define TEST_FUNC1_CONST_DBL(FUNC) \
+  verify_nops<func_##FUNC<Double>>(#FUNC "(D)",1); \
+  verify_nops<func_##FUNC<const Double>>(#FUNC "(cD)",1);
+
+#define TEST_BINARY_OP_NONCONST_DBL(OP,SYM) \
+  verify_nops<binary_##SYM<Double,Double>>("D" #OP "D",1); \
+  verify_nops<binary_##SYM<Double,double>>("D" #OP "d",1); \
+  verify_nops<binary_##SYM<double,Double>>("d" #OP "D",1); \
+  verify_nops<binary_##SYM<Double,const Double>>("D" #OP "cD",1); \
+  verify_nops<binary_##SYM<Double,const double>>("D" #OP "cd",1); \
+  verify_nops<binary_##SYM<double,const Double>>("d" #OP "cD",1);
+
+#define TEST_BINARY_OP_CONST_DBL(OP,SYM) \
+  verify_nops<binary_##SYM<Double,Double>>("D" #OP "D",1); \
+  verify_nops<binary_##SYM<Double,double>>("D" #OP "d",1); \
+  verify_nops<binary_##SYM<double,Double>>("d" #OP "D",1); \
+  verify_nops<binary_##SYM<const Double,Double>>("cD" #OP "D",1); \
+  verify_nops<binary_##SYM<const Double,double>>("cD" #OP "d",1); \
+  verify_nops<binary_##SYM<const double,Double>>("cd" #OP "D",1); \
+  verify_nops<binary_##SYM<Double,const Double>>("D" #OP "cD",1); \
+  verify_nops<binary_##SYM<Double,const double>>("D" #OP "cd",1); \
+  verify_nops<binary_##SYM<double,const Double>>("d" #OP "cD",1); \
+  verify_nops<binary_##SYM<const Double,const Double>>("cD" #OP "cD",1); \
+  verify_nops<binary_##SYM<const Double,const double>>("cD" #OP "cd",1); \
+  verify_nops<binary_##SYM<const double,const Double>>("cd" #OP "cD",1);
 
 int main(int argc, char** argv)
 {
   MPI_Init(&argc, &argv);
 
-  run_fxn(op, 1);
+  TEST_UNARY_POSTFIX_OP_NONCONST_DBL(++,ppr);
+  TEST_UNARY_POSTFIX_OP_NONCONST_DBL(--,mmr);
+
+  TEST_UNARY_PREFIX_OP_NONCONST_DBL(++,ppl);
+  TEST_UNARY_PREFIX_OP_NONCONST_DBL(--,mml);
+  TEST_UNARY_PREFIX_OP_NONCONST_DBL(-,ml);
+
+  TEST_FUNC1_CONST_DBL(sqrt);
+  TEST_FUNC1_CONST_DBL(cbrt);
+  TEST_FUNC1_CONST_DBL(fabs);
+
+  TEST_BINARY_OP_CONST_DBL(+,p);
+  TEST_BINARY_OP_CONST_DBL(-,m);
+  TEST_BINARY_OP_CONST_DBL(*,t);
+  TEST_BINARY_OP_CONST_DBL(/,d);
+
+  TEST_BINARY_OP_NONCONST_DBL(+=,pe);
+  TEST_BINARY_OP_NONCONST_DBL(-=,me);
+  TEST_BINARY_OP_NONCONST_DBL(*=,te);
+  TEST_BINARY_OP_NONCONST_DBL(/=,de);
+
+  TEST_BINARY_OP_CONST_DBL(&,a);
+  TEST_BINARY_OP_CONST_DBL(|,o);
+
+  TEST_BINARY_OP_NONCONST_DBL(&=,ae);
+  TEST_BINARY_OP_NONCONST_DBL(|=,oe);
 
   MPI_Finalize();
 
-  return 0;
+  if (n_failures > 0){
+    std::cerr << "Some tests failed!\n";
+    return 1;
+  } else {
+    std::cerr << "All tests passed.\n";
+    return 0;
+  }
 }
