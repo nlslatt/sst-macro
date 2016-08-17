@@ -66,6 +66,10 @@ void*
 memcpy(const VariablePtr<T>& dst, const VariablePtr<T>& src, size_t size);
 
 template <class T>
+void*
+memcpy(const VariablePtr<T>& dst, const T * const src, size_t size);
+
+template <class T>
 class Variable 
 {
   FRIEND_OPERATOR(+,const,)
@@ -255,6 +259,7 @@ class VariablePtr
 {
   friend void* memset<>(const VariablePtr<T>& t, int value, size_t size);
   friend void* memcpy<>(const VariablePtr<T>& dst, const VariablePtr<T>& src, size_t size);
+  friend void* memcpy<>(const VariablePtr<T>& dst, const T * const src, size_t size);
 
  public:
   VariablePtr()
@@ -380,6 +385,13 @@ memset(const VariablePtr<T>& t, int value, size_t size){
 template <class T>
 void*
 memcpy(const VariablePtr<T>& dst, const VariablePtr<T>& src, size_t size){
+  dst.nops += size / sizeof(T);
+  return 0;
+}
+
+template <class T>
+void*
+memcpy(const VariablePtr<T>& dst, const T * const src, size_t size){
   dst.nops += size / sizeof(T);
   return 0;
 }
