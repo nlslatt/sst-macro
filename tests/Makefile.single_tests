@@ -7,7 +7,8 @@ SINGLETESTS = \
   test_pthread \
   test_blas \
   test_blas_finegrained \
-  test_node_noise 
+  test_node_noise  \
+  test_variable
 
 #  test_scan  TODO
 
@@ -43,6 +44,9 @@ test_node_noise.$(CHKSUF): test_blas
 test_pthread.$(CHKSUF): test_pthread
 	$(PYRUNTEST) 6 $(top_srcdir) $@ True \
     ./test_pthread --no-wall-time -f $(srcdir)/test_configs/pthread.ini 
+
+test_variable.$(CHKSUF): test_variable
+	$(PYRUNTEST) 6 $(top_srcdir) $@ notime ./test_variable -f $(srcdir)/test_configs/test_variable.ini
 
 #------------------------------------------------------------------------------------------#
 #  DUMPI-related tests                                                                  {{{#

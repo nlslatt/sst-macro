@@ -1,6 +1,6 @@
 
 if !INTEGRATED_SST_CORE
-check_PROGRAMS = test_utilities test_pthread test_blas test_scan test_uq
+check_PROGRAMS = test_utilities test_pthread test_blas test_scan test_uq test_variable
 test_utilities_SOURCES = test_utilities.cc
 test_utilities_LDADD = $(CORE_LIBS) 
 
@@ -24,5 +24,12 @@ test_blas_LDADD = $(CORE_LIBS) \
   $(top_builddir)/sstmac/libraries/blas/libsstmac_blas.la \
   $(top_builddir)/sstmac/main/libsstmac_main.la \
   libsstmac_test_blas.la
+
+lib_LTLIBRARIES += libsstmac_test_variable.la
+test_variable_SOURCES = dummy_variable.cc
+libsstmac_test_variable_la_SOURCES = test_variable.cc
+test_variable_LDADD = $(CORE_LIBS) \
+  $(top_builddir)/sstmac/main/libsstmac_main.la \
+  libsstmac_test_variable.la
 endif
 
