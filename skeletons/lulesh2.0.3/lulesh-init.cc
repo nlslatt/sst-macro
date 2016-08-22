@@ -484,7 +484,11 @@ Domain::CreateRegionIndexSets(Int_t nr, Int_t balance)
       Index_t regndx = regElemSize(r)++; // Note increment
       regElemlist(r,regndx) = i;
    }
-   
+
+#ifdef LULESH_SST_MODS
+   delete [] m_regNumList;
+   m_regNumList = 0;
+#endif
 }
 
 /////////////////////////////////////////////////////////////
