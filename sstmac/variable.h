@@ -7,43 +7,66 @@
 #include <sstmac/software/process/thread.h>
 #include <sstmac/software/process/operating_system.h>
 
-#define DECLARE_OPERATOR(op,CONST,REF) \
+#define DECLARE_OPERATOR_CONST(op) \
   template <class T, class U> \
-  Variable<T>REF \
-  operator op(CONST Variable<T>& t, const U& u); \
+  Variable<T> \
+  operator op(const Variable<T>& t, const U& u); \
   template <class T, class U> \
-  U REF \
-  operator op(CONST U& u, const Variable<T>& t); \
+  Variable<T> \
+  operator op(const U& u, const Variable<T>& t); \
   template <class T, class U> \
-  Variable<T> REF \
-  operator op(CONST Variable<T>& t, const Variable<U>& u);
+  Variable<T> \
+  operator op(const Variable<T>& t, const Variable<U>& u);
 
-#define FRIEND_OPERATOR(op,CONST,REF) \
+#define DECLARE_OPERATOR_MOD(op) \
+  template <class T, class U> \
+  Variable<T>& \
+  operator op(Variable<T>& t, const U& u); \
+  template <class T, class U> \
+  U& \
+  operator op(U& u, const Variable<T>& t); \
+  template <class T, class U> \
+  Variable<T>& \
+  operator op(Variable<T>& t, const Variable<U>& u);
+
+#define FRIEND_OPERATOR_CONST(op) \
   template <class T1, class U> \
-  friend Variable<T1> REF \
-  operator op(CONST Variable<T1>& t, const U& u); \
+  friend Variable<T1> \
+  operator op(const Variable<T1>& t, const U& u); \
   template <class T1, class U> \
-  friend U REF \
-  operator op(CONST U& u, const Variable<T1>& t); \
+  friend Variable<T1> \
+  operator op(const U& u, const Variable<T1>& t); \
   template <class T1, class U> \
-  friend Variable<T1> REF \
-  operator op(CONST Variable<T1>& t, const Variable<U>& u);
+  friend Variable<T1> \
+  operator op(const Variable<T1>& t, const Variable<U>& u);
+
+#define FRIEND_OPERATOR_MOD(op) \
+  template <class T1, class U> \
+  friend Variable<T1>& \
+  operator op(Variable<T1>& t, const U& u); \
+  template <class T1, class U> \
+  friend U& \
+  operator op(U& u, const Variable<T1>& t); \
+  template <class T1, class U> \
+  friend Variable<T1>& \
+  operator op(Variable<T1>& t, const Variable<U>& u);
 
 template <class T> class VariablePtr;
 template <class T> class Variable;
 
-DECLARE_OPERATOR(+,const,)
-DECLARE_OPERATOR(-,const,)
-DECLARE_OPERATOR(*,const,)
-DECLARE_OPERATOR(/,const,)
-DECLARE_OPERATOR(&,const,)
-DECLARE_OPERATOR(|,const,)
-DECLARE_OPERATOR(+=,,&)
-DECLARE_OPERATOR(*=,,&)
-DECLARE_OPERATOR(-=,,&)
-DECLARE_OPERATOR(/=,,&)
-DECLARE_OPERATOR(&=,,&)
-DECLARE_OPERATOR(|=,,&)
+DECLARE_OPERATOR_CONST(+)
+DECLARE_OPERATOR_CONST(-)
+DECLARE_OPERATOR_CONST(*)
+DECLARE_OPERATOR_CONST(/)
+DECLARE_OPERATOR_CONST(&)
+DECLARE_OPERATOR_CONST(|)
+
+DECLARE_OPERATOR_MOD(+=)
+DECLARE_OPERATOR_MOD(*=)
+DECLARE_OPERATOR_MOD(-=)
+DECLARE_OPERATOR_MOD(/=)
+DECLARE_OPERATOR_MOD(&=)
+DECLARE_OPERATOR_MOD(|=)
 
 template <class T>
 Variable<T>
@@ -72,18 +95,20 @@ memcpy(const VariablePtr<T>& dst, const T * const src, size_t size);
 template <class T>
 class Variable 
 {
-  FRIEND_OPERATOR(+,const,)
-  FRIEND_OPERATOR(-,const,)
-  FRIEND_OPERATOR(*,const,)
-  FRIEND_OPERATOR(/,const,)
-  FRIEND_OPERATOR(&,const,)
-  FRIEND_OPERATOR(|,const,)
-  FRIEND_OPERATOR(+=,,&)
-  FRIEND_OPERATOR(*=,,&)
-  FRIEND_OPERATOR(-=,,&)
-  FRIEND_OPERATOR(/=,,&)
-  FRIEND_OPERATOR(&=,,&)
-  FRIEND_OPERATOR(|=,,&)
+  FRIEND_OPERATOR_CONST(+)
+  FRIEND_OPERATOR_CONST(-)
+  FRIEND_OPERATOR_CONST(*)
+  FRIEND_OPERATOR_CONST(/)
+  FRIEND_OPERATOR_CONST(&)
+  FRIEND_OPERATOR_CONST(|)
+
+  FRIEND_OPERATOR_MOD(+=)
+  FRIEND_OPERATOR_MOD(*=)
+  FRIEND_OPERATOR_MOD(-=)
+  FRIEND_OPERATOR_MOD(/=)
+  FRIEND_OPERATOR_MOD(&=)
+  FRIEND_OPERATOR_MOD(|=)
+
   friend Variable<T> sqrt<>(const Variable<T> &t);
   friend Variable<T> cbrt<>(const Variable<T> &t);
   friend Variable<T> fabs<>(const Variable<T> &t);
@@ -193,22 +218,42 @@ class Variable
     return true; \
   }
 
-#define OPERATOR(op,CONST,REF) \
+#define OPERATOR_CONST(op) \
   template <class T, class U> \
-  Variable<T>REF \
-  operator op(CONST Variable<T>& t, const U& u){ \
+  Variable<T> \
+  operator op(const Variable<T>& t, const U& u){ \
     t.nops++; \
     return t; \
   } \
   template <class T, class U> \
-  U REF \
-  operator op(CONST U& u, const Variable<T>& t){ \
+  Variable<T> \
+  operator op(const U& u, const Variable<T>& t){ \
+    t.nops++; \
+    return t;\
+  } \
+  template <class T, class U> \
+  Variable<T> \
+  operator op(const Variable<T>& t, const Variable<U>& u){ \
+    t.nops++; \
+    return t; \
+  }
+
+#define OPERATOR_MOD(op) \
+  template <class T, class U> \
+  Variable<T>& \
+  operator op(Variable<T>& t, const U& u){ \
+    t.nops++; \
+    return t; \
+  } \
+  template <class T, class U> \
+  U& \
+  operator op(U& u, const Variable<T>& t){ \
     t.nops++; \
     return u;\
   } \
   template <class T, class U> \
-  Variable<T> REF \
-  operator op(CONST Variable<T>& t, const Variable<U>& u){ \
+  Variable<T>& \
+  operator op(Variable<T>& t, const Variable<U>& u){ \
     t.nops++; \
     return t; \
   }
@@ -219,18 +264,20 @@ COMPARE(>)
 COMPARE(<=)
 COMPARE(>=)
 COMPARE(==)
-OPERATOR(+,const,)
-OPERATOR(-,const,)
-OPERATOR(*,const,)
-OPERATOR(/,const,)
-OPERATOR(&,const,)
-OPERATOR(|,const,)
-OPERATOR(+=,,&)
-OPERATOR(*=,,&)
-OPERATOR(-=,,&)
-OPERATOR(/=,,&)
-OPERATOR(&=,,&)
-OPERATOR(|=,,&)
+
+OPERATOR_CONST(+)
+OPERATOR_CONST(-)
+OPERATOR_CONST(*)
+OPERATOR_CONST(/)
+OPERATOR_CONST(&)
+OPERATOR_CONST(|)
+
+OPERATOR_MOD(+=)
+OPERATOR_MOD(*=)
+OPERATOR_MOD(-=)
+OPERATOR_MOD(/=)
+OPERATOR_MOD(&=)
+OPERATOR_MOD(|=)
 
 template <class T>
 Variable<T>

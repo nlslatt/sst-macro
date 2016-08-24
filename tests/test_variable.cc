@@ -48,6 +48,10 @@ verify_nops(const std::string &name, int nops_expected){
   template <typename T, typename U> \
   struct binary_##SYM { void operator()(){ T a = 0; U b = 0; a OP b; } };
 
+#define DEF_TRINARY_OP(OP1,OP2,SYM) \
+  template <typename T, typename U, typename V> \
+  struct trinary_##SYM { void operator()(){ T a = 0; U b = 0; V c = 1; a OP1 b OP2 c; } };
+
 DEF_UNARY_POSTFIX_OP(++,ppr);
 DEF_UNARY_POSTFIX_OP(--,mmr);
 
@@ -74,6 +78,9 @@ DEF_BINARY_OP(|,o);
 
 DEF_BINARY_OP(&=,ae);
 DEF_BINARY_OP(|=,oe);
+
+DEF_TRINARY_OP(+,-,pm);
+DEF_TRINARY_OP(*,/,td);
 
 template <typename T, typename N>
 struct func_memset {
@@ -127,6 +134,16 @@ struct func_memcpy3 {
   verify_nops<binary_##SYM<const Double,const double>>("cD" #OP "cd",1); \
   verify_nops<binary_##SYM<const double,const Double>>("cd" #OP "cD",1);
 
+#define TEST_TRINARY_OP_CONST_DBL(OP1,OP2,SYM) \
+  verify_nops<trinary_##SYM<double,Double,double>>("d" #OP1 "D" #OP2 "d",2); \
+  verify_nops<trinary_##SYM<double,Double,const double>>("d" #OP1 "D" #OP2 "cd",2); \
+  verify_nops<trinary_##SYM<double,const Double,double>>("d" #OP1 "cD" #OP2 "d",2); \
+  verify_nops<trinary_##SYM<double,const Double,const double>>("d" #OP1 "cD" #OP2 "cd",2); \
+  verify_nops<trinary_##SYM<const double,Double,double>>("cd" #OP1 "D" #OP2 "d",2); \
+  verify_nops<trinary_##SYM<const double,Double,const double>>("cd" #OP1 "D" #OP2 "cd",2); \
+  verify_nops<trinary_##SYM<const double,const Double,double>>("cd" #OP1 "cD" #OP2 "d",2); \
+  verify_nops<trinary_##SYM<const double,const Double,const double>>("cd" #OP1 "cD" #OP2 "cd",2);
+
 int main(int argc, char** argv)
 {
   MPI_Init(&argc, &argv);
@@ -157,6 +174,9 @@ int main(int argc, char** argv)
 
   TEST_BINARY_OP_NONCONST_DBL(&=,ae);
   TEST_BINARY_OP_NONCONST_DBL(|=,oe);
+
+  TEST_TRINARY_OP_CONST_DBL(+,-,pm);
+  TEST_TRINARY_OP_CONST_DBL(*,/,td);
 
   verify_nops<func_memset<DoublePtr,double>>("memset(D)",10);
   verify_nops<func_memcpy1<DoublePtr,DoublePtr,double>>("memcpy(D,D)",10);
