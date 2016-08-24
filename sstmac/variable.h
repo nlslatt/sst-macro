@@ -9,13 +9,13 @@
 
 #define DECLARE_OPERATOR_CONST(op) \
   template <class T, class U> \
-  Variable<T> \
+  Variable<T>& \
   operator op(const Variable<T>& t, const U& u); \
   template <class T, class U> \
-  Variable<T> \
+  Variable<T>& \
   operator op(const U& u, const Variable<T>& t); \
   template <class T, class U> \
-  Variable<T> \
+  Variable<T>& \
   operator op(const Variable<T>& t, const Variable<U>& u);
 
 #define DECLARE_OPERATOR_MOD(op) \
@@ -31,13 +31,13 @@
 
 #define FRIEND_OPERATOR_CONST(op) \
   template <class T1, class U> \
-  friend Variable<T1> \
+  friend Variable<T1>& \
   operator op(const Variable<T1>& t, const U& u); \
   template <class T1, class U> \
-  friend Variable<T1> \
+  friend Variable<T1>& \
   operator op(const U& u, const Variable<T1>& t); \
   template <class T1, class U> \
-  friend Variable<T1> \
+  friend Variable<T1>& \
   operator op(const Variable<T1>& t, const Variable<U>& u);
 
 #define FRIEND_OPERATOR_MOD(op) \
@@ -220,22 +220,22 @@ class Variable
 
 #define OPERATOR_CONST(op) \
   template <class T, class U> \
-  Variable<T> \
+  Variable<T>& \
   operator op(const Variable<T>& t, const U& u){ \
     t.nops++; \
-    return t; \
+    return const_cast<Variable<T>&>(t); \
   } \
   template <class T, class U> \
-  Variable<T> \
+  Variable<T>& \
   operator op(const U& u, const Variable<T>& t){ \
     t.nops++; \
-    return t;\
+    return const_cast<Variable<T>&>(t); \
   } \
   template <class T, class U> \
-  Variable<T> \
+  Variable<T>& \
   operator op(const Variable<T>& t, const Variable<U>& u){ \
     t.nops++; \
-    return t; \
+    return const_cast<Variable<T>&>(t); \
   }
 
 #define OPERATOR_MOD(op) \
