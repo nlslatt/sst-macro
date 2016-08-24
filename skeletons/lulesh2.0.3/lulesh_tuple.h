@@ -64,6 +64,8 @@ typedef VariablePtr<Index_t> Index_t_ptr_const_sim;
 typedef VariablePtr<Index_t> const_Index_t_ptr_sim;
 typedef VariablePtr<Index_t> const_Index_t_ptr_const_sim;
 typedef VariablePtr<Index_t> Index_t_vec_sim;
+// to make sure we catch flops on real variables:
+#define Index_t_sim_conv Variable<Index_t>
 
 typedef Variable<Int_t> Int_t_sim;
 typedef VariablePtr<Int_t> Int_t_vec_sim;
@@ -81,6 +83,7 @@ typedef Index_t* const Index_t_ptr_const_sim;
 typedef const Index_t* const_Index_t_ptr_sim;
 typedef const Index_t* const const_Index_t_ptr_const_sim;
 typedef std::vector<Index_t> Index_t_vec_sim;
+#define Index_t_sim_conv
 
 typedef Int_t Int_t_sim;
 typedef std::vector<Int_t> Int_t_vec_sim;

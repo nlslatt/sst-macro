@@ -191,9 +191,9 @@ void VerifyAndWriteFinalOutput(Real_t_sim elapsed_time,
    printf("   Final Origin Energy = %12.6e \n", locDom.e(ElemId));
 #endif
 
-   Real_t_sim   MaxAbsDiff = Real_t_sim(0.0);
-   Real_t_sim TotalAbsDiff = Real_t_sim(0.0);
-   Real_t_sim   MaxRelDiff = Real_t_sim(0.0);
+   Real_t_sim   MaxAbsDiff = Real_t(0.0);
+   Real_t_sim TotalAbsDiff = Real_t(0.0);
+   Real_t_sim   MaxRelDiff = Real_t(0.0);
 
    for (Index_t j=0; j<nx; ++j) {
       for (Index_t k=j+1; k<nx; ++k) {

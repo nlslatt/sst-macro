@@ -214,18 +214,18 @@ void TimeIncrement(Domain& domain)
 {
    Real_t_sim targetdt = domain.stoptime() - domain.time() ;
 
-   if ((domain.dtfixed() <= Real_t_sim(0.0)) && (domain.cycle() != Int_t(0))) {
+   if ((domain.dtfixed() <= Real_t(0.0)) && (domain.cycle() != Int_t(0))) {
       Real_t_sim ratio ;
       Real_t_sim olddt = domain.deltatime() ;
 
       /* This will require a reduction in parallel */
-      Real_t_sim gnewdt = Real_t_sim(1.0e+20) ;
+      Real_t_sim gnewdt = Real_t(1.0e+20) ;
       Real_t_sim newdt ;
       if (domain.dtcourant() < gnewdt) {
-         gnewdt = domain.dtcourant() / Real_t_sim(2.0) ;
+         gnewdt = domain.dtcourant() / Real_t(2.0) ;
       }
       if (domain.dthydro() < gnewdt) {
-         gnewdt = domain.dthydro() * Real_t_sim(2.0) / Real_t_sim(3.0) ;
+         gnewdt = domain.dthydro() * Real_t(2.0) / Real_t(3.0) ;
       }
 
 #if USE_MPI      
@@ -237,7 +237,7 @@ void TimeIncrement(Domain& domain)
 #endif
       
       ratio = newdt / olddt ;
-      if (ratio >= Real_t_sim(1.0)) {
+      if (ratio >= Real_t(1.0)) {
          if (ratio < domain.deltatimemultlb()) {
             newdt = olddt ;
          }
@@ -254,8 +254,8 @@ void TimeIncrement(Domain& domain)
 
    /* TRY TO PREVENT VERY SMALL SCALING ON THE NEXT CYCLE */
    if ((targetdt > domain.deltatime()) &&
-       (targetdt < (Real_t_sim(4.0) * domain.deltatime() / Real_t_sim(3.0))) ) {
-      targetdt = Real_t_sim(2.0) * domain.deltatime() / Real_t_sim(3.0) ;
+       (targetdt < (Real_t(4.0) * domain.deltatime() / Real_t(3.0))) ) {
+      targetdt = Real_t(2.0) * domain.deltatime() / Real_t(3.0) ;
    }
 
    if (targetdt < domain.deltatime()) {
@@ -362,17 +362,17 @@ void CalcElemShapeFunctionDerivatives( Real_t_sim const x[],
   Real_t_sim cjyxi, cjyet, cjyze;
   Real_t_sim cjzxi, cjzet, cjzze;
 
-  fjxxi = Real_t_sim(.125) * ( (x6-x0) + (x5-x3) - (x7-x1) - (x4-x2) );
-  fjxet = Real_t_sim(.125) * ( (x6-x0) - (x5-x3) + (x7-x1) - (x4-x2) );
-  fjxze = Real_t_sim(.125) * ( (x6-x0) + (x5-x3) + (x7-x1) + (x4-x2) );
+  fjxxi = Real_t(.125) * ( (x6-x0) + (x5-x3) - (x7-x1) - (x4-x2) );
+  fjxet = Real_t(.125) * ( (x6-x0) - (x5-x3) + (x7-x1) - (x4-x2) );
+  fjxze = Real_t(.125) * ( (x6-x0) + (x5-x3) + (x7-x1) + (x4-x2) );
 
-  fjyxi = Real_t_sim(.125) * ( (y6-y0) + (y5-y3) - (y7-y1) - (y4-y2) );
-  fjyet = Real_t_sim(.125) * ( (y6-y0) - (y5-y3) + (y7-y1) - (y4-y2) );
-  fjyze = Real_t_sim(.125) * ( (y6-y0) + (y5-y3) + (y7-y1) + (y4-y2) );
+  fjyxi = Real_t(.125) * ( (y6-y0) + (y5-y3) - (y7-y1) - (y4-y2) );
+  fjyet = Real_t(.125) * ( (y6-y0) - (y5-y3) + (y7-y1) - (y4-y2) );
+  fjyze = Real_t(.125) * ( (y6-y0) + (y5-y3) + (y7-y1) + (y4-y2) );
 
-  fjzxi = Real_t_sim(.125) * ( (z6-z0) + (z5-z3) - (z7-z1) - (z4-z2) );
-  fjzet = Real_t_sim(.125) * ( (z6-z0) - (z5-z3) + (z7-z1) - (z4-z2) );
-  fjzze = Real_t_sim(.125) * ( (z6-z0) + (z5-z3) + (z7-z1) + (z4-z2) );
+  fjzxi = Real_t(.125) * ( (z6-z0) + (z5-z3) - (z7-z1) - (z4-z2) );
+  fjzet = Real_t(.125) * ( (z6-z0) - (z5-z3) + (z7-z1) - (z4-z2) );
+  fjzze = Real_t(.125) * ( (z6-z0) + (z5-z3) + (z7-z1) + (z4-z2) );
 
   /* compute cofactors */
   cjxxi =    (fjyet * fjzze) - (fjzet * fjyze);
@@ -419,7 +419,7 @@ void CalcElemShapeFunctionDerivatives( Real_t_sim const x[],
   b[2][7] = -b[2][1];
 
   /* calculate jacobian determinant (volume) */
-  *volume = Real_t_sim(8.) * ( fjxet * cjxet + fjyet * cjyet + fjzet * cjzet);
+  *volume = Real_t(8.) * ( fjxet * cjxet + fjyet * cjyet + fjzet * cjzet);
 }
 
 /******************************************/
@@ -434,15 +434,15 @@ void SumElemFaceNormal(Real_t_ptr_sim normalX0, Real_t_ptr_sim normalY0, Real_t_
                        const Real_t_sim x2, const Real_t_sim y2, const Real_t_sim z2,
                        const Real_t_sim x3, const Real_t_sim y3, const Real_t_sim z3)
 {
-   Real_t_sim bisectX0 = Real_t_sim(0.5) * (x3 + x2 - x1 - x0);
-   Real_t_sim bisectY0 = Real_t_sim(0.5) * (y3 + y2 - y1 - y0);
-   Real_t_sim bisectZ0 = Real_t_sim(0.5) * (z3 + z2 - z1 - z0);
-   Real_t_sim bisectX1 = Real_t_sim(0.5) * (x2 + x1 - x3 - x0);
-   Real_t_sim bisectY1 = Real_t_sim(0.5) * (y2 + y1 - y3 - y0);
-   Real_t_sim bisectZ1 = Real_t_sim(0.5) * (z2 + z1 - z3 - z0);
-   Real_t_sim areaX = Real_t_sim(0.25) * (bisectY0 * bisectZ1 - bisectZ0 * bisectY1);
-   Real_t_sim areaY = Real_t_sim(0.25) * (bisectZ0 * bisectX1 - bisectX0 * bisectZ1);
-   Real_t_sim areaZ = Real_t_sim(0.25) * (bisectX0 * bisectY1 - bisectY0 * bisectX1);
+   Real_t_sim bisectX0 = Real_t(0.5) * (x3 + x2 - x1 - x0);
+   Real_t_sim bisectY0 = Real_t(0.5) * (y3 + y2 - y1 - y0);
+   Real_t_sim bisectZ0 = Real_t(0.5) * (z3 + z2 - z1 - z0);
+   Real_t_sim bisectX1 = Real_t(0.5) * (x2 + x1 - x3 - x0);
+   Real_t_sim bisectY1 = Real_t(0.5) * (y2 + y1 - y3 - y0);
+   Real_t_sim bisectZ1 = Real_t(0.5) * (z2 + z1 - z3 - z0);
+   Real_t_sim areaX = Real_t(0.25) * (bisectY0 * bisectZ1 - bisectZ0 * bisectY1);
+   Real_t_sim areaY = Real_t(0.25) * (bisectZ0 * bisectX1 - bisectX0 * bisectZ1);
+   Real_t_sim areaZ = Real_t(0.25) * (bisectX0 * bisectY1 - bisectY0 * bisectX1);
 
    *normalX0 += areaX;
    *normalX1 += areaX;
@@ -471,9 +471,9 @@ void CalcElemNodeNormals(Real_t_sim pfx[8],
                          const Real_t_sim z[8])
 {
    for (Index_t i = 0 ; i < 8 ; ++i) {
-      pfx[i] = Real_t_sim(0.0);
-      pfy[i] = Real_t_sim(0.0);
-      pfz[i] = Real_t_sim(0.0);
+      pfx[i] = Real_t(0.0);
+      pfy[i] = Real_t(0.0);
+      pfz[i] = Real_t(0.0);
    }
    /* evaluate face one: nodes 0, 1, 2, 3 */
    SumElemFaceNormal(&pfx[0], &pfy[0], &pfz[0],
@@ -613,9 +613,9 @@ void IntegrateStressForElems( Domain &domain,
      {
         Index_t count = domain.nodeElemCount(gnode) ;
         Index_t_ptr_sim cornerList = domain.nodeElemCornerList(gnode) ;
-        Real_t_sim fx_tmp = Real_t_sim(0.0) ;
-        Real_t_sim fy_tmp = Real_t_sim(0.0) ;
-        Real_t_sim fz_tmp = Real_t_sim(0.0) ;
+        Real_t_sim fx_tmp = Real_t(0.0) ;
+        Real_t_sim fy_tmp = Real_t(0.0) ;
+        Real_t_sim fz_tmp = Real_t(0.0) ;
         for (Index_t i=0 ; i < count ; ++i) {
            Index_t elem = cornerList[i] ;
            fx_tmp += fx_elem[elem] ;
@@ -643,7 +643,7 @@ void VoluDer(const Real_t_sim x0, const Real_t_sim x1, const Real_t_sim x2,
              const Real_t_sim z3, const Real_t_sim z4, const Real_t_sim z5,
              Real_t_ptr_sim dvdx, Real_t_ptr_sim dvdy, Real_t_ptr_sim dvdz)
 {
-   const Real_t_sim twelfth = Real_t_sim(1.0) / Real_t_sim(12.0) ;
+   const Real_t_sim twelfth = Real_t_sim(1.0) / Real_t(12.0) ;
 
    *dvdx =
       (y1 + y2) * (z0 + z1) - (y0 + y1) * (z1 + z2) +
@@ -788,38 +788,38 @@ void CalcFBHourglassForceForElems( Domain &domain,
 
    Real_t_sim  gamma[4][8];
 
-   gamma[0][0] = Real_t_sim( 1.);
-   gamma[0][1] = Real_t_sim( 1.);
-   gamma[0][2] = Real_t_sim(-1.);
-   gamma[0][3] = Real_t_sim(-1.);
-   gamma[0][4] = Real_t_sim(-1.);
-   gamma[0][5] = Real_t_sim(-1.);
-   gamma[0][6] = Real_t_sim( 1.);
-   gamma[0][7] = Real_t_sim( 1.);
-   gamma[1][0] = Real_t_sim( 1.);
-   gamma[1][1] = Real_t_sim(-1.);
-   gamma[1][2] = Real_t_sim(-1.);
-   gamma[1][3] = Real_t_sim( 1.);
-   gamma[1][4] = Real_t_sim(-1.);
-   gamma[1][5] = Real_t_sim( 1.);
-   gamma[1][6] = Real_t_sim( 1.);
-   gamma[1][7] = Real_t_sim(-1.);
-   gamma[2][0] = Real_t_sim( 1.);
-   gamma[2][1] = Real_t_sim(-1.);
-   gamma[2][2] = Real_t_sim( 1.);
-   gamma[2][3] = Real_t_sim(-1.);
-   gamma[2][4] = Real_t_sim( 1.);
-   gamma[2][5] = Real_t_sim(-1.);
-   gamma[2][6] = Real_t_sim( 1.);
-   gamma[2][7] = Real_t_sim(-1.);
-   gamma[3][0] = Real_t_sim(-1.);
-   gamma[3][1] = Real_t_sim( 1.);
-   gamma[3][2] = Real_t_sim(-1.);
-   gamma[3][3] = Real_t_sim( 1.);
-   gamma[3][4] = Real_t_sim( 1.);
-   gamma[3][5] = Real_t_sim(-1.);
-   gamma[3][6] = Real_t_sim( 1.);
-   gamma[3][7] = Real_t_sim(-1.);
+   gamma[0][0] = Real_t( 1.);
+   gamma[0][1] = Real_t( 1.);
+   gamma[0][2] = Real_t(-1.);
+   gamma[0][3] = Real_t(-1.);
+   gamma[0][4] = Real_t(-1.);
+   gamma[0][5] = Real_t(-1.);
+   gamma[0][6] = Real_t( 1.);
+   gamma[0][7] = Real_t( 1.);
+   gamma[1][0] = Real_t( 1.);
+   gamma[1][1] = Real_t(-1.);
+   gamma[1][2] = Real_t(-1.);
+   gamma[1][3] = Real_t( 1.);
+   gamma[1][4] = Real_t(-1.);
+   gamma[1][5] = Real_t( 1.);
+   gamma[1][6] = Real_t( 1.);
+   gamma[1][7] = Real_t(-1.);
+   gamma[2][0] = Real_t( 1.);
+   gamma[2][1] = Real_t(-1.);
+   gamma[2][2] = Real_t( 1.);
+   gamma[2][3] = Real_t(-1.);
+   gamma[2][4] = Real_t( 1.);
+   gamma[2][5] = Real_t(-1.);
+   gamma[2][6] = Real_t( 1.);
+   gamma[2][7] = Real_t(-1.);
+   gamma[3][0] = Real_t(-1.);
+   gamma[3][1] = Real_t( 1.);
+   gamma[3][2] = Real_t(-1.);
+   gamma[3][3] = Real_t( 1.);
+   gamma[3][4] = Real_t( 1.);
+   gamma[3][5] = Real_t(-1.);
+   gamma[3][6] = Real_t( 1.);
+   gamma[3][7] = Real_t(-1.);
 
 /*************************************************/
 /*    compute the hourglass modes */
@@ -837,7 +837,7 @@ void CalcFBHourglassForceForElems( Domain &domain,
 
       const Index_t_ptr_sim elemToNode = domain.nodelist(i2);
       Index_t i3=8*i2;
-      Real_t_sim volinv=Real_t_sim(1.0)/determ[i2];
+      Real_t_sim volinv=Real_t(1.0)/determ[i2];
       Real_t_sim ss1, mass1, volume13 ;
       for(Index_t i1=0;i1<4;++i1){
 
@@ -936,7 +936,7 @@ void CalcFBHourglassForceForElems( Domain &domain,
       zd1[6] = domain.zd(n6si2);
       zd1[7] = domain.zd(n7si2);
 
-      coefficient = - hourg * Real_t_sim(0.01) * ss1 * mass1 / volume13;
+      coefficient = - hourg * Real_t(0.01) * ss1 * mass1 / volume13;
 
       CalcElemFBHourglassForce(xd1,yd1,zd1,
                       hourgam,
@@ -1017,9 +1017,9 @@ void CalcFBHourglassForceForElems( Domain &domain,
       {
          Index_t count = domain.nodeElemCount(gnode) ;
          Index_t_ptr_sim cornerList = domain.nodeElemCornerList(gnode) ;
-         Real_t_sim fx_tmp = Real_t_sim(0.0) ;
-         Real_t_sim fy_tmp = Real_t_sim(0.0) ;
-         Real_t_sim fz_tmp = Real_t_sim(0.0) ;
+         Real_t_sim fx_tmp = Real_t(0.0) ;
+         Real_t_sim fy_tmp = Real_t(0.0) ;
+         Real_t_sim fz_tmp = Real_t(0.0) ;
          for (Index_t i=0 ; i < count ; ++i) {
             Index_t elem = cornerList[i] ;
             fx_tmp += fx_elem[elem] ;
@@ -1077,7 +1077,7 @@ void CalcHourglassControlForElems(Domain& domain,
       determ[i] = domain.volo(i) * domain.v(i);
 
       /* Do a check for negative volumes */
-      if ( domain.v(i) <= Real_t_sim(0.0) ) {
+      if ( domain.v(i) <= Real_t(0.0) ) {
 #if !defined(LULESH_SST_MODS) || !defined(LULESH_SST_SIM)
 #if USE_MPI         
          MPI_Abort(MPI_COMM_WORLD, VolumeError) ;
@@ -1088,7 +1088,7 @@ void CalcHourglassControlForElems(Domain& domain,
       }
    }
 
-   if ( hgcoef > Real_t_sim(0.) ) {
+   if ( hgcoef > Real_t(0.) ) {
       CalcFBHourglassForceForElems( domain,
                                     determ, x8n, y8n, z8n, dvdx, dvdy, dvdz,
                                     hgcoef, numElem, domain.numNode()) ;
@@ -1129,7 +1129,7 @@ void CalcVolumeForceForElems(Domain& domain)
       // check for negative element volume
 #pragma omp parallel for firstprivate(numElem)
       for ( Index_t k=0 ; k<numElem ; ++k ) {
-         if (determ[k] <= Real_t_sim(0.0)) {
+         if (determ[k] <= Real_t(0.0)) {
 #if !defined(LULESH_SST_MODS) || !defined(LULESH_SST_SIM)
 #if USE_MPI            
             MPI_Abort(MPI_COMM_WORLD, VolumeError) ;
@@ -1163,9 +1163,9 @@ static inline void CalcForceForNodes(Domain& domain)
 
 #pragma omp parallel for firstprivate(numNode)
   for (Index_t i=0; i<numNode; ++i) {
-     domain.fx(i) = Real_t_sim(0.0) ;
-     domain.fy(i) = Real_t_sim(0.0) ;
-     domain.fz(i) = Real_t_sim(0.0) ;
+     domain.fx(i) = Real_t(0.0) ;
+     domain.fy(i) = Real_t(0.0) ;
+     domain.fz(i) = Real_t(0.0) ;
   }
 
   /* Calcforce calls partial, force, hourq */
@@ -1211,19 +1211,19 @@ void ApplyAccelerationBoundaryConditionsForNodes(Domain& domain)
       if (!domain.symmXempty() != 0) {
 #pragma omp for nowait firstprivate(numNodeBC)
          for(Index_t i=0 ; i<numNodeBC ; ++i)
-            domain.xdd(domain.symmX(i)) = Real_t_sim(0.0) ;
+            domain.xdd(domain.symmX(i)) = Real_t(0.0) ;
       }
 
       if (!domain.symmYempty() != 0) {
 #pragma omp for nowait firstprivate(numNodeBC)
          for(Index_t i=0 ; i<numNodeBC ; ++i)
-            domain.ydd(domain.symmY(i)) = Real_t_sim(0.0) ;
+            domain.ydd(domain.symmY(i)) = Real_t(0.0) ;
       }
 
       if (!domain.symmZempty() != 0) {
 #pragma omp for nowait firstprivate(numNodeBC)
          for(Index_t i=0 ; i<numNodeBC ; ++i)
-            domain.zdd(domain.symmZ(i)) = Real_t_sim(0.0) ;
+            domain.zdd(domain.symmZ(i)) = Real_t(0.0) ;
       }
    }
 }
@@ -1241,15 +1241,15 @@ void CalcVelocityForNodes(Domain &domain, const Real_t_sim dt, const Real_t_sim 
      Real_t_sim xdtmp, ydtmp, zdtmp ;
 
      xdtmp = domain.xd(i) + domain.xdd(i) * dt ;
-     if( FABS(xdtmp) < u_cut ) xdtmp = Real_t_sim(0.0);
+     if( FABS(xdtmp) < u_cut ) xdtmp = Real_t(0.0);
      domain.xd(i) = xdtmp ;
 
      ydtmp = domain.yd(i) + domain.ydd(i) * dt ;
-     if( FABS(ydtmp) < u_cut ) ydtmp = Real_t_sim(0.0);
+     if( FABS(ydtmp) < u_cut ) ydtmp = Real_t(0.0);
      domain.yd(i) = ydtmp ;
 
      zdtmp = domain.zd(i) + domain.zdd(i) * dt ;
-     if( FABS(zdtmp) < u_cut ) zdtmp = Real_t_sim(0.0);
+     if( FABS(zdtmp) < u_cut ) zdtmp = Real_t(0.0);
      domain.zd(i) = zdtmp ;
    }
 }
@@ -1334,7 +1334,7 @@ Real_t_sim CalcElemVolume( const Real_t_sim x0, const Real_t_sim x1,
                const Real_t_sim z4, const Real_t_sim z5,
                const Real_t_sim z6, const Real_t_sim z7 )
 {
-  Real_t_sim twelveth = Real_t_sim(1.0)/Real_t_sim(12.0);
+  Real_t_sim twelveth = Real_t_sim(1.0)/Real_t(12.0);
 
   Real_t_sim dx61 = x6 - x1;
   Real_t_sim dy61 = y6 - y1;
@@ -1447,7 +1447,7 @@ Real_t_sim CalcElemCharacteristicLength( const Real_t_sim x[8],
                                      const Real_t_sim z[8],
                                      const Real_t_sim volume)
 {
-   Real_t_sim a, charLength = Real_t_sim(0.0);
+   Real_t_sim a, charLength = Real_t(0.0);
 
    a = AreaFace(x[0],x[1],x[2],x[3],
                 y[0],y[1],y[2],y[3],
@@ -1479,7 +1479,7 @@ Real_t_sim CalcElemCharacteristicLength( const Real_t_sim x[8],
                 z[3],z[0],z[4],z[7]) ;
    charLength = std::max(a,charLength) ;
 
-   charLength = Real_t_sim(4.0) * volume / SQRT(charLength);
+   charLength = Real_t(4.0) * volume / SQRT(charLength);
 
    return charLength;
 }
@@ -1494,7 +1494,7 @@ void CalcElemVelocityGradient( const_Real_t_ptr_sim xvel,
                                 const Real_t_sim detJ,
                                 Real_t_ptr_const_sim d )
 {
-  const Real_t_sim inv_detJ = Real_t_sim(1.0) / detJ ;
+  const Real_t_sim inv_detJ = Real_t(1.0) / detJ ;
   Real_t_sim dyddx, dxddy, dzddx, dxddz, dzddy, dyddz;
   const_Real_t_ptr_const_sim pfx = b[0];
   const_Real_t_ptr_const_sim pfy = b[1];
@@ -1544,9 +1544,9 @@ void CalcElemVelocityGradient( const_Real_t_ptr_sim xvel,
                       + pfz[1] * (yvel[1]-yvel[7])
                       + pfz[2] * (yvel[2]-yvel[4])
                       + pfz[3] * (yvel[3]-yvel[5]) );
-  d[5]  = Real_t_sim( .5) * ( dxddy + dyddx );
-  d[4]  = Real_t_sim( .5) * ( dxddz + dzddx );
-  d[3]  = Real_t_sim( .5) * ( dzddy + dyddz );
+  d[5]  = Real_t( .5) * ( dxddy + dyddx );
+  d[4]  = Real_t( .5) * ( dxddz + dzddx );
+  d[3]  = Real_t( .5) * ( dzddy + dyddz );
 }
 
 /******************************************/
@@ -1568,7 +1568,7 @@ void CalcKinematicsForElems( Domain &domain, Real_t_ptr_sim vnew,
     Real_t_sim xd_local[8] ;
     Real_t_sim yd_local[8] ;
     Real_t_sim zd_local[8] ;
-    Real_t_sim detJ = Real_t_sim(0.0) ;
+    Real_t_sim detJ = Real_t(0.0) ;
 
     Real_t_sim volume ;
     Real_t_sim relativeVolume ;
@@ -1596,7 +1596,7 @@ void CalcKinematicsForElems( Domain &domain, Real_t_ptr_sim vnew,
       zd_local[lnode] = domain.zd(gnode);
     }
 
-    Real_t_sim dt2 = Real_t_sim(0.5) * deltaTime;
+    Real_t_sim dt2 = Real_t(0.5) * deltaTime;
     for ( Index_t j=0 ; j<8 ; ++j )
     {
        x_local[j] -= dt2 * xd_local[j];
@@ -1636,7 +1636,7 @@ void CalcLagrangeElements(Domain& domain, Real_t_ptr_sim vnew)
       {
          // calc strain rate and apply as constraint (only done in FB element)
          Real_t_sim vdov = domain.dxx(k) + domain.dyy(k) + domain.dzz(k) ;
-         Real_t_sim vdovthird = vdov/Real_t_sim(3.0) ;
+         Real_t_sim vdovthird = vdov/Real_t(3.0) ;
 
          // make the rate of deformation tensor deviatoric
          domain.vdov(k) = vdov ;
@@ -1645,7 +1645,7 @@ void CalcLagrangeElements(Domain& domain, Real_t_ptr_sim vnew)
          domain.dzz(k) -= vdovthird ;
 
         // See if any volumes are negative, and take appropriate action.
-         if (vnew[k] <= Real_t_sim(0.0))
+         if (vnew[k] <= Real_t(0.0))
         {
 #if !defined(LULESH_SST_MODS) || !defined(LULESH_SST_SIM)
 #if USE_MPI           
@@ -1669,7 +1669,7 @@ void CalcMonotonicQGradientsForElems(Domain& domain, Real_t_ptr_sim vnew)
 
 #pragma omp parallel for firstprivate(numElem)
    for (Index_t i = 0 ; i < numElem ; ++i ) {
-      const Real_t_sim ptiny = Real_t_sim(1.e-36) ;
+      const Real_t_sim ptiny = Real_t(1.e-36) ;
       Real_t_sim ax,ay,az ;
       Real_t_sim dxv,dyv,dzv ;
 
@@ -1738,19 +1738,19 @@ void CalcMonotonicQGradientsForElems(Domain& domain, Real_t_ptr_sim vnew)
       Real_t_sim zv7 = domain.zd(n7) ;
 
       Real_t_sim vol = domain.volo(i)*vnew[i] ;
-      Real_t_sim norm = Real_t_sim(1.0) / ( vol + ptiny ) ;
+      Real_t_sim norm = Real_t(1.0) / ( vol + ptiny ) ;
 
-      Real_t_sim dxj = Real_t_sim(-0.25)*((x0+x1+x5+x4) - (x3+x2+x6+x7)) ;
-      Real_t_sim dyj = Real_t_sim(-0.25)*((y0+y1+y5+y4) - (y3+y2+y6+y7)) ;
-      Real_t_sim dzj = Real_t_sim(-0.25)*((z0+z1+z5+z4) - (z3+z2+z6+z7)) ;
+      Real_t_sim dxj = Real_t(-0.25)*((x0+x1+x5+x4) - (x3+x2+x6+x7)) ;
+      Real_t_sim dyj = Real_t(-0.25)*((y0+y1+y5+y4) - (y3+y2+y6+y7)) ;
+      Real_t_sim dzj = Real_t(-0.25)*((z0+z1+z5+z4) - (z3+z2+z6+z7)) ;
 
-      Real_t_sim dxi = Real_t_sim( 0.25)*((x1+x2+x6+x5) - (x0+x3+x7+x4)) ;
-      Real_t_sim dyi = Real_t_sim( 0.25)*((y1+y2+y6+y5) - (y0+y3+y7+y4)) ;
-      Real_t_sim dzi = Real_t_sim( 0.25)*((z1+z2+z6+z5) - (z0+z3+z7+z4)) ;
+      Real_t_sim dxi = Real_t( 0.25)*((x1+x2+x6+x5) - (x0+x3+x7+x4)) ;
+      Real_t_sim dyi = Real_t( 0.25)*((y1+y2+y6+y5) - (y0+y3+y7+y4)) ;
+      Real_t_sim dzi = Real_t( 0.25)*((z1+z2+z6+z5) - (z0+z3+z7+z4)) ;
 
-      Real_t_sim dxk = Real_t_sim( 0.25)*((x4+x5+x6+x7) - (x0+x1+x2+x3)) ;
-      Real_t_sim dyk = Real_t_sim( 0.25)*((y4+y5+y6+y7) - (y0+y1+y2+y3)) ;
-      Real_t_sim dzk = Real_t_sim( 0.25)*((z4+z5+z6+z7) - (z0+z1+z2+z3)) ;
+      Real_t_sim dxk = Real_t( 0.25)*((x4+x5+x6+x7) - (x0+x1+x2+x3)) ;
+      Real_t_sim dyk = Real_t( 0.25)*((y4+y5+y6+y7) - (y0+y1+y2+y3)) ;
+      Real_t_sim dzk = Real_t( 0.25)*((z4+z5+z6+z7) - (z0+z1+z2+z3)) ;
 
       /* find delvk and delxk ( i cross j ) */
 
@@ -1764,9 +1764,9 @@ void CalcMonotonicQGradientsForElems(Domain& domain, Real_t_ptr_sim vnew)
       ay *= norm ;
       az *= norm ;
 
-      dxv = Real_t_sim(0.25)*((xv4+xv5+xv6+xv7) - (xv0+xv1+xv2+xv3)) ;
-      dyv = Real_t_sim(0.25)*((yv4+yv5+yv6+yv7) - (yv0+yv1+yv2+yv3)) ;
-      dzv = Real_t_sim(0.25)*((zv4+zv5+zv6+zv7) - (zv0+zv1+zv2+zv3)) ;
+      dxv = Real_t(0.25)*((xv4+xv5+xv6+xv7) - (xv0+xv1+xv2+xv3)) ;
+      dyv = Real_t(0.25)*((yv4+yv5+yv6+yv7) - (yv0+yv1+yv2+yv3)) ;
+      dzv = Real_t(0.25)*((zv4+zv5+zv6+zv7) - (zv0+zv1+zv2+zv3)) ;
 
       domain.delv_zeta(i) = ax*dxv + ay*dyv + az*dzv ;
 
@@ -1782,9 +1782,9 @@ void CalcMonotonicQGradientsForElems(Domain& domain, Real_t_ptr_sim vnew)
       ay *= norm ;
       az *= norm ;
 
-      dxv = Real_t_sim(0.25)*((xv1+xv2+xv6+xv5) - (xv0+xv3+xv7+xv4)) ;
-      dyv = Real_t_sim(0.25)*((yv1+yv2+yv6+yv5) - (yv0+yv3+yv7+yv4)) ;
-      dzv = Real_t_sim(0.25)*((zv1+zv2+zv6+zv5) - (zv0+zv3+zv7+zv4)) ;
+      dxv = Real_t(0.25)*((xv1+xv2+xv6+xv5) - (xv0+xv3+xv7+xv4)) ;
+      dyv = Real_t(0.25)*((yv1+yv2+yv6+yv5) - (yv0+yv3+yv7+yv4)) ;
+      dzv = Real_t(0.25)*((zv1+zv2+zv6+zv5) - (zv0+zv3+zv7+zv4)) ;
 
       domain.delv_xi(i) = ax*dxv + ay*dyv + az*dzv ;
 
@@ -1800,9 +1800,9 @@ void CalcMonotonicQGradientsForElems(Domain& domain, Real_t_ptr_sim vnew)
       ay *= norm ;
       az *= norm ;
 
-      dxv = Real_t_sim(-0.25)*((xv0+xv1+xv5+xv4) - (xv3+xv2+xv6+xv7)) ;
-      dyv = Real_t_sim(-0.25)*((yv0+yv1+yv5+yv4) - (yv3+yv2+yv6+yv7)) ;
-      dzv = Real_t_sim(-0.25)*((zv0+zv1+zv5+zv4) - (zv3+zv2+zv6+zv7)) ;
+      dxv = Real_t(-0.25)*((xv0+xv1+xv5+xv4) - (xv3+xv2+xv6+xv7)) ;
+      dyv = Real_t(-0.25)*((yv0+yv1+yv5+yv4) - (yv3+yv2+yv6+yv7)) ;
+      dzv = Real_t(-0.25)*((zv0+zv1+zv5+zv4) - (zv3+zv2+zv6+zv7)) ;
 
       domain.delv_eta(i) = ax*dxv + ay*dyv + az*dzv ;
    }
@@ -1828,13 +1828,13 @@ void CalcMonotonicQRegionForElems(Domain &domain, Int_t r,
       Real_t_sim delvm = 0.0, delvp =0.0;
 
       /*  phixi     */
-      Real_t_sim norm = Real_t_sim(1.) / (domain.delv_xi(i)+ ptiny ) ;
+      Real_t_sim norm = Real_t(1.) / (domain.delv_xi(i)+ ptiny ) ;
 
       switch (bcMask & XI_M) {
          case XI_M_COMM: /* needs comm data */
          case 0:         delvm = domain.delv_xi(domain.lxim(i)); break ;
          case XI_M_SYMM: delvm = domain.delv_xi(i) ;       break ;
-         case XI_M_FREE: delvm = Real_t_sim(0.0) ;      break ;
+         case XI_M_FREE: delvm = Real_t(0.0) ;      break ;
          default:          fprintf(stderr, "Error in switch at %s line %d\n",
                                    __FILE__, __LINE__);
             delvm = 0; /* ERROR - but quiets the compiler */
@@ -1844,7 +1844,7 @@ void CalcMonotonicQRegionForElems(Domain &domain, Int_t r,
          case XI_P_COMM: /* needs comm data */
          case 0:         delvp = domain.delv_xi(domain.lxip(i)) ; break ;
          case XI_P_SYMM: delvp = domain.delv_xi(i) ;       break ;
-         case XI_P_FREE: delvp = Real_t_sim(0.0) ;      break ;
+         case XI_P_FREE: delvp = Real_t(0.0) ;      break ;
          default:          fprintf(stderr, "Error in switch at %s line %d\n",
                                    __FILE__, __LINE__);
             delvp = 0; /* ERROR - but quiets the compiler */
@@ -1854,25 +1854,25 @@ void CalcMonotonicQRegionForElems(Domain &domain, Int_t r,
       delvm = delvm * norm ;
       delvp = delvp * norm ;
 
-      phixi = Real_t_sim(.5) * ( delvm + delvp ) ;
+      phixi = Real_t(.5) * ( delvm + delvp ) ;
 
       delvm *= monoq_limiter_mult ;
       delvp *= monoq_limiter_mult ;
 
       if ( delvm < phixi ) phixi = delvm ;
       if ( delvp < phixi ) phixi = delvp ;
-      if ( phixi < Real_t_sim(0.)) phixi = Real_t_sim(0.) ;
+      if ( phixi < Real_t(0.)) phixi = Real_t(0.) ;
       if ( phixi > monoq_max_slope) phixi = monoq_max_slope;
 
 
       /*  phieta     */
-      norm = Real_t_sim(1.) / ( domain.delv_eta(i) + ptiny ) ;
+      norm = Real_t(1.) / ( domain.delv_eta(i) + ptiny ) ;
 
       switch (bcMask & ETA_M) {
          case ETA_M_COMM: /* needs comm data */
          case 0:          delvm = domain.delv_eta(domain.letam(i)) ; break ;
          case ETA_M_SYMM: delvm = domain.delv_eta(i) ;        break ;
-         case ETA_M_FREE: delvm = Real_t_sim(0.0) ;        break ;
+         case ETA_M_FREE: delvm = Real_t(0.0) ;        break ;
          default:          fprintf(stderr, "Error in switch at %s line %d\n",
                                    __FILE__, __LINE__);
             delvm = 0; /* ERROR - but quiets the compiler */
@@ -1882,7 +1882,7 @@ void CalcMonotonicQRegionForElems(Domain &domain, Int_t r,
          case ETA_P_COMM: /* needs comm data */
          case 0:          delvp = domain.delv_eta(domain.letap(i)) ; break ;
          case ETA_P_SYMM: delvp = domain.delv_eta(i) ;        break ;
-         case ETA_P_FREE: delvp = Real_t_sim(0.0) ;        break ;
+         case ETA_P_FREE: delvp = Real_t(0.0) ;        break ;
          default:          fprintf(stderr, "Error in switch at %s line %d\n",
                                    __FILE__, __LINE__);
             delvp = 0; /* ERROR - but quiets the compiler */
@@ -1892,24 +1892,24 @@ void CalcMonotonicQRegionForElems(Domain &domain, Int_t r,
       delvm = delvm * norm ;
       delvp = delvp * norm ;
 
-      phieta = Real_t_sim(.5) * ( delvm + delvp ) ;
+      phieta = Real_t(.5) * ( delvm + delvp ) ;
 
       delvm *= monoq_limiter_mult ;
       delvp *= monoq_limiter_mult ;
 
       if ( delvm  < phieta ) phieta = delvm ;
       if ( delvp  < phieta ) phieta = delvp ;
-      if ( phieta < Real_t_sim(0.)) phieta = Real_t_sim(0.) ;
+      if ( phieta < Real_t(0.)) phieta = Real_t(0.) ;
       if ( phieta > monoq_max_slope)  phieta = monoq_max_slope;
 
       /*  phizeta     */
-      norm = Real_t_sim(1.) / ( domain.delv_zeta(i) + ptiny ) ;
+      norm = Real_t(1.) / ( domain.delv_zeta(i) + ptiny ) ;
 
       switch (bcMask & ZETA_M) {
          case ZETA_M_COMM: /* needs comm data */
          case 0:           delvm = domain.delv_zeta(domain.lzetam(i)) ; break ;
          case ZETA_M_SYMM: delvm = domain.delv_zeta(i) ;         break ;
-         case ZETA_M_FREE: delvm = Real_t_sim(0.0) ;          break ;
+         case ZETA_M_FREE: delvm = Real_t(0.0) ;          break ;
          default:          fprintf(stderr, "Error in switch at %s line %d\n",
                                    __FILE__, __LINE__);
             delvm = 0; /* ERROR - but quiets the compiler */
@@ -1919,7 +1919,7 @@ void CalcMonotonicQRegionForElems(Domain &domain, Int_t r,
          case ZETA_P_COMM: /* needs comm data */
          case 0:           delvp = domain.delv_zeta(domain.lzetap(i)) ; break ;
          case ZETA_P_SYMM: delvp = domain.delv_zeta(i) ;         break ;
-         case ZETA_P_FREE: delvp = Real_t_sim(0.0) ;          break ;
+         case ZETA_P_FREE: delvp = Real_t(0.0) ;          break ;
          default:          fprintf(stderr, "Error in switch at %s line %d\n",
                                    __FILE__, __LINE__);
             delvp = 0; /* ERROR - but quiets the compiler */
@@ -1929,42 +1929,42 @@ void CalcMonotonicQRegionForElems(Domain &domain, Int_t r,
       delvm = delvm * norm ;
       delvp = delvp * norm ;
 
-      phizeta = Real_t_sim(.5) * ( delvm + delvp ) ;
+      phizeta = Real_t(.5) * ( delvm + delvp ) ;
 
       delvm *= monoq_limiter_mult ;
       delvp *= monoq_limiter_mult ;
 
       if ( delvm   < phizeta ) phizeta = delvm ;
       if ( delvp   < phizeta ) phizeta = delvp ;
-      if ( phizeta < Real_t_sim(0.)) phizeta = Real_t_sim(0.);
+      if ( phizeta < Real_t(0.)) phizeta = Real_t(0.);
       if ( phizeta > monoq_max_slope  ) phizeta = monoq_max_slope;
 
       /* Remove length scale */
 
-      if ( domain.vdov(i) > Real_t_sim(0.) )  {
-         qlin  = Real_t_sim(0.) ;
-         qquad = Real_t_sim(0.) ;
+      if ( domain.vdov(i) > Real_t(0.) )  {
+         qlin  = Real_t(0.) ;
+         qquad = Real_t(0.) ;
       }
       else {
          Real_t_sim delvxxi   = domain.delv_xi(i)   * domain.delx_xi(i)   ;
          Real_t_sim delvxeta  = domain.delv_eta(i)  * domain.delx_eta(i)  ;
          Real_t_sim delvxzeta = domain.delv_zeta(i) * domain.delx_zeta(i) ;
 
-         if ( delvxxi   > Real_t_sim(0.) ) delvxxi   = Real_t_sim(0.) ;
-         if ( delvxeta  > Real_t_sim(0.) ) delvxeta  = Real_t_sim(0.) ;
-         if ( delvxzeta > Real_t_sim(0.) ) delvxzeta = Real_t_sim(0.) ;
+         if ( delvxxi   > Real_t(0.) ) delvxxi   = Real_t(0.) ;
+         if ( delvxeta  > Real_t(0.) ) delvxeta  = Real_t(0.) ;
+         if ( delvxzeta > Real_t(0.) ) delvxzeta = Real_t(0.) ;
 
          Real_t_sim rho = domain.elemMass(i) / (domain.volo(i) * vnew[i]) ;
 
          qlin = -qlc_monoq * rho *
-            (  delvxxi   * (Real_t_sim(1.) - phixi) +
-               delvxeta  * (Real_t_sim(1.) - phieta) +
-               delvxzeta * (Real_t_sim(1.) - phizeta)  ) ;
+            (  delvxxi   * (Real_t(1.) - phixi) +
+               delvxeta  * (Real_t(1.) - phieta) +
+               delvxzeta * (Real_t(1.) - phizeta)  ) ;
 
          qquad = qqc_monoq * rho *
-            (  delvxxi*delvxxi     * (Real_t_sim(1.) - phixi*phixi) +
-               delvxeta*delvxeta   * (Real_t_sim(1.) - phieta*phieta) +
-               delvxzeta*delvxzeta * (Real_t_sim(1.) - phizeta*phizeta)  ) ;
+            (  delvxxi*delvxxi     * (Real_t(1.) - phixi*phixi) +
+               delvxeta*delvxeta   * (Real_t(1.) - phieta*phieta) +
+               delvxzeta*delvxzeta * (Real_t(1.) - phizeta*phizeta)  ) ;
       }
 
       domain.qq(i) = qquad ;
@@ -1980,7 +1980,7 @@ void CalcMonotonicQForElems(Domain& domain, Real_t_ptr_sim vnew)
    //
    // initialize parameters
    // 
-   const Real_t_sim ptiny = Real_t_sim(1.e-36) ;
+   const Real_t_sim ptiny = Real_t(1.e-36) ;
 
    //
    // calculate the monotonic q for all regions
@@ -2076,8 +2076,8 @@ void CalcPressureForElems(Real_t_ptr_sim p_new, Real_t_ptr_sim bvc,
 {
 #pragma omp parallel for firstprivate(length)
    for (Index_t i = 0; i < length ; ++i) {
-      Real_t_sim c1s = Real_t_sim(2.0)/Real_t_sim(3.0) ;
-      bvc[i] = c1s * (compression[i] + Real_t_sim(1.));
+      Real_t_sim c1s = Real_t_sim(2.0)/Real_t(3.0) ;
+      bvc[i] = c1s * (compression[i] + Real_t(1.));
       pbvc[i] = c1s;
    }
 
@@ -2088,10 +2088,10 @@ void CalcPressureForElems(Real_t_ptr_sim p_new, Real_t_ptr_sim bvc,
       p_new[i] = bvc[i] * e_old[i] ;
 
       if    (FABS(p_new[i]) <  p_cut   )
-         p_new[i] = Real_t_sim(0.0) ;
+         p_new[i] = Real_t(0.0) ;
 
       if    ( vnewc[elem] >= eosvmax ) /* impossible condition here? */
-         p_new[i] = Real_t_sim(0.0) ;
+         p_new[i] = Real_t(0.0) ;
 
       if    (p_new[i]       <  pmin)
          p_new[i]   = pmin ;
@@ -2116,8 +2116,8 @@ void CalcEnergyForElems(Real_t_ptr_sim p_new, Real_t_ptr_sim e_new, Real_t_ptr_s
 
 #pragma omp parallel for firstprivate(length, emin)
    for (Index_t i = 0 ; i < length ; ++i) {
-      e_new[i] = e_old[i] - Real_t_sim(0.5) * delvc[i] * (p_old[i] + q_old[i])
-         + Real_t_sim(0.5) * work[i];
+      e_new[i] = e_old[i] - Real_t(0.5) * delvc[i] * (p_old[i] + q_old[i])
+         + Real_t(0.5) * work[i];
 
       if (e_new[i]  < emin ) {
          e_new[i] = emin ;
@@ -2129,17 +2129,17 @@ void CalcEnergyForElems(Real_t_ptr_sim p_new, Real_t_ptr_sim e_new, Real_t_ptr_s
 
 #pragma omp parallel for firstprivate(length, rho0)
    for (Index_t i = 0 ; i < length ; ++i) {
-      Real_t_sim vhalf = Real_t_sim(1.) / (Real_t_sim(1.) + compHalfStep[i]) ;
+      Real_t_sim vhalf = Real_t(1.) / (Real_t(1.) + compHalfStep[i]) ;
 
-      if ( delvc[i] > Real_t_sim(0.) ) {
-         q_new[i] /* = qq_old[i] = ql_old[i] */ = Real_t_sim(0.) ;
+      if ( delvc[i] > Real_t(0.) ) {
+         q_new[i] /* = qq_old[i] = ql_old[i] */ = Real_t(0.) ;
       }
       else {
          Real_t_sim ssc = ( pbvc[i] * e_new[i]
                  + vhalf * vhalf * bvc[i] * pHalfStep[i] ) / rho0 ;
 
-         if ( ssc <= Real_t_sim(.1111111e-36) ) {
-            ssc = Real_t_sim(.3333333e-18) ;
+         if ( ssc <= Real_t(.1111111e-36) ) {
+            ssc = Real_t(.3333333e-18) ;
          } else {
             ssc = SQRT(ssc) ;
          }
@@ -2147,18 +2147,18 @@ void CalcEnergyForElems(Real_t_ptr_sim p_new, Real_t_ptr_sim e_new, Real_t_ptr_s
          q_new[i] = (ssc*ql_old[i] + qq_old[i]) ;
       }
 
-      e_new[i] = e_new[i] + Real_t_sim(0.5) * delvc[i]
-         * (  Real_t_sim(3.0)*(p_old[i]     + q_old[i])
-              - Real_t_sim(4.0)*(pHalfStep[i] + q_new[i])) ;
+      e_new[i] = e_new[i] + Real_t(0.5) * delvc[i]
+         * (  Real_t(3.0)*(p_old[i]     + q_old[i])
+              - Real_t(4.0)*(pHalfStep[i] + q_new[i])) ;
    }
 
 #pragma omp parallel for firstprivate(length, emin, e_cut)
    for (Index_t i = 0 ; i < length ; ++i) {
 
-      e_new[i] += Real_t_sim(0.5) * work[i];
+      e_new[i] += Real_t(0.5) * work[i];
 
       if (FABS(e_new[i]) < e_cut) {
-         e_new[i] = Real_t_sim(0.)  ;
+         e_new[i] = Real_t(0.)  ;
       }
       if (     e_new[i]  < emin ) {
          e_new[i] = emin ;
@@ -2170,19 +2170,19 @@ void CalcEnergyForElems(Real_t_ptr_sim p_new, Real_t_ptr_sim e_new, Real_t_ptr_s
 
 #pragma omp parallel for firstprivate(length, rho0, emin, e_cut)
    for (Index_t i = 0 ; i < length ; ++i){
-      const Real_t_sim sixth = Real_t_sim(1.0) / Real_t_sim(6.0) ;
+      const Real_t_sim sixth = Real_t_sim(1.0) / Real_t(6.0) ;
       Index_t_sim elem = regElemList[i];
       Real_t_sim q_tilde ;
 
-      if (delvc[i] > Real_t_sim(0.)) {
-         q_tilde = Real_t_sim(0.) ;
+      if (delvc[i] > Real_t(0.)) {
+         q_tilde = Real_t(0.) ;
       }
       else {
          Real_t_sim ssc = ( pbvc[i] * e_new[i]
                  + vnewc[elem] * vnewc[elem] * bvc[i] * p_new[i] ) / rho0 ;
 
-         if ( ssc <= Real_t_sim(.1111111e-36) ) {
-            ssc = Real_t_sim(.3333333e-18) ;
+         if ( ssc <= Real_t(.1111111e-36) ) {
+            ssc = Real_t(.3333333e-18) ;
          } else {
             ssc = SQRT(ssc) ;
          }
@@ -2190,12 +2190,12 @@ void CalcEnergyForElems(Real_t_ptr_sim p_new, Real_t_ptr_sim e_new, Real_t_ptr_s
          q_tilde = (ssc*ql_old[i] + qq_old[i]) ;
       }
 
-      e_new[i] = e_new[i] - (  Real_t_sim(7.0)*(p_old[i]     + q_old[i])
-                               - Real_t_sim(8.0)*(pHalfStep[i] + q_new[i])
+      e_new[i] = e_new[i] - (  Real_t(7.0)*(p_old[i]     + q_old[i])
+                               - Real_t(8.0)*(pHalfStep[i] + q_new[i])
                                + (p_new[i] + q_tilde)) * delvc[i]*sixth ;
 
       if (FABS(e_new[i]) < e_cut) {
-         e_new[i] = Real_t_sim(0.)  ;
+         e_new[i] = Real_t(0.)  ;
       }
       if (     e_new[i]  < emin ) {
          e_new[i] = emin ;
@@ -2209,19 +2209,19 @@ void CalcEnergyForElems(Real_t_ptr_sim p_new, Real_t_ptr_sim e_new, Real_t_ptr_s
    for (Index_t i = 0 ; i < length ; ++i){
       Index_t_sim elem = regElemList[i];
 
-      if ( delvc[i] <= Real_t_sim(0.) ) {
+      if ( delvc[i] <= Real_t(0.) ) {
          Real_t_sim ssc = ( pbvc[i] * e_new[i]
                  + vnewc[elem] * vnewc[elem] * bvc[i] * p_new[i] ) / rho0 ;
 
-         if ( ssc <= Real_t_sim(.1111111e-36) ) {
-            ssc = Real_t_sim(.3333333e-18) ;
+         if ( ssc <= Real_t(.1111111e-36) ) {
+            ssc = Real_t(.3333333e-18) ;
          } else {
             ssc = SQRT(ssc) ;
          }
 
          q_new[i] = (ssc*ql_old[i] + qq_old[i]) ;
 
-         if (FABS(q_new[i]) < q_cut) q_new[i] = Real_t_sim(0.) ;
+         if (FABS(q_new[i]) < q_cut) q_new[i] = Real_t(0.) ;
       }
    }
 
@@ -2244,8 +2244,8 @@ void CalcSoundSpeedForElems(Domain &domain,
       Index_t_sim elem = regElemList[i];
       Real_t_sim ssTmp = (pbvc[i] * enewc[i] + vnewc[elem] * vnewc[elem] *
                  bvc[i] * pnewc[i]) / rho0;
-      if (ssTmp <= Real_t_sim(.1111111e-36)) {
-         ssTmp = Real_t_sim(.3333333e-18);
+      if (ssTmp <= Real_t(.1111111e-36)) {
+         ssTmp = Real_t(.3333333e-18);
       }
       else {
          ssTmp = SQRT(ssTmp);
@@ -2309,13 +2309,13 @@ void EvalEOSForElems(Domain& domain, Real_t_ptr_sim vnewc,
          for (Index_t i = 0; i < numElemReg ; ++i) {
             Index_t_sim elem = regElemList[i];
             Real_t_sim vchalf ;
-            compression[i] = Real_t_sim(1.) / vnewc[elem] - Real_t_sim(1.);
-            vchalf = vnewc[elem] - delvc[i] * Real_t_sim(.5);
-            compHalfStep[i] = Real_t_sim(1.) / vchalf - Real_t_sim(1.);
+            compression[i] = Real_t(1.) / vnewc[elem] - Real_t(1.);
+            vchalf = vnewc[elem] - delvc[i] * Real_t(.5);
+            compHalfStep[i] = Real_t(1.) / vchalf - Real_t(1.);
          }
 
       /* Check for v > eosvmax or v < eosvmin */
-         if ( eosvmin != Real_t_sim(0.) ) {
+         if ( eosvmin != Real_t(0.) ) {
 #pragma omp for nowait firstprivate(numElemReg, eosvmin)
             for(Index_t i=0 ; i<numElemReg ; ++i) {
                Index_t_sim elem = regElemList[i];
@@ -2324,21 +2324,21 @@ void EvalEOSForElems(Domain& domain, Real_t_ptr_sim vnewc,
                }
             }
          }
-         if ( eosvmax != Real_t_sim(0.) ) {
+         if ( eosvmax != Real_t(0.) ) {
 #pragma omp for nowait firstprivate(numElemReg, eosvmax)
             for(Index_t i=0 ; i<numElemReg ; ++i) {
                Index_t_sim elem = regElemList[i];
                if (vnewc[elem] >= eosvmax) { /* impossible due to calling func? */
-                  p_old[i]        = Real_t_sim(0.) ;
-                  compression[i]  = Real_t_sim(0.) ;
-                  compHalfStep[i] = Real_t_sim(0.) ;
+                  p_old[i]        = Real_t(0.) ;
+                  compression[i]  = Real_t(0.) ;
+                  compHalfStep[i] = Real_t(0.) ;
                }
             }
          }
 
 #pragma omp for nowait firstprivate(numElemReg)
          for (Index_t i = 0 ; i < numElemReg ; ++i) {
-            work[i] = Real_t_sim(0.) ; 
+            work[i] = Real_t(0.) ; 
          }
       }
       CalcEnergyForElems(p_new, e_new, q_new, bvc, pbvc,
@@ -2393,7 +2393,7 @@ void ApplyMaterialPropertiesForElems(Domain& domain, Real_t_ptr_sim vnew)
 #pragma omp parallel
     {
        // Bound the updated relative volumes with eosvmin/max
-       if (eosvmin != Real_t_sim(0.)) {
+       if (eosvmin != Real_t(0.)) {
 #pragma omp for firstprivate(numElem)
           for(Index_t i=0 ; i<numElem ; ++i) {
              if (vnew[i] < eosvmin)
@@ -2401,7 +2401,7 @@ void ApplyMaterialPropertiesForElems(Domain& domain, Real_t_ptr_sim vnew)
           }
        }
 
-       if (eosvmax != Real_t_sim(0.)) {
+       if (eosvmax != Real_t(0.)) {
 #pragma omp for nowait firstprivate(numElem)
           for(Index_t i=0 ; i<numElem ; ++i) {
              if (vnew[i] > eosvmax)
@@ -2415,11 +2415,11 @@ void ApplyMaterialPropertiesForElems(Domain& domain, Real_t_ptr_sim vnew)
 #pragma omp for nowait firstprivate(numElem)
        for (Index_t i=0; i<numElem; ++i) {
           Real_t_sim vc = domain.v(i) ;
-          if (eosvmin != Real_t_sim(0.)) {
+          if (eosvmin != Real_t(0.)) {
              if (vc < eosvmin)
                 vc = eosvmin ;
           }
-          if (eosvmax != Real_t_sim(0.)) {
+          if (eosvmax != Real_t(0.)) {
              if (vc > eosvmax)
                 vc = eosvmax ;
           }
@@ -2466,8 +2466,8 @@ void UpdateVolumesForElems(Domain &domain, Real_t_ptr_sim vnew,
       for(Index_t i=0 ; i<length ; ++i) {
          Real_t_sim tmpV = vnew[i] ;
 
-         if ( FABS(tmpV - Real_t_sim(1.0)) < v_cut )
-            tmpV = Real_t_sim(1.0) ;
+         if ( FABS(tmpV - Real_t(1.0)) < v_cut )
+            tmpV = Real_t(1.0) ;
 
          domain.v(i) = tmpV ;
       }
@@ -2522,7 +2522,7 @@ void CalcCourantConstraintForElems(Domain &domain, Index_t length,
 
 #pragma omp parallel firstprivate(length, qqc)
    {
-      Real_t_sim   qqc2 = Real_t_sim(64.0) * qqc * qqc ;
+      Real_t_sim   qqc2 = Real_t(64.0) * qqc * qqc ;
       Real_t_sim   dtcourant_tmp = dtcourant;
       Index_t_sim  courant_elem  = -1 ;
 
@@ -2537,7 +2537,7 @@ void CalcCourantConstraintForElems(Domain &domain, Index_t length,
          Index_t_sim indx = regElemlist[i] ;
          Real_t_sim dtf = domain.ss(indx) * domain.ss(indx) ;
 
-         if ( domain.vdov(indx) < Real_t_sim(0.) ) {
+         if ( domain.vdov(indx) < Real_t(0.) ) {
             dtf = dtf
                 + qqc2 * domain.arealg(indx) * domain.arealg(indx)
                 * domain.vdov(indx) * domain.vdov(indx) ;
@@ -2546,7 +2546,7 @@ void CalcCourantConstraintForElems(Domain &domain, Index_t length,
          dtf = SQRT(dtf) ;
          dtf = domain.arealg(indx) / dtf ;
 
-         if (domain.vdov(indx) != Real_t_sim(0.)) {
+         if (domain.vdov(indx) != Real_t(0.)) {
             if ( dtf < dtcourant_tmp ) {
                dtcourant_tmp = dtf ;
                courant_elem  = indx ;
@@ -2610,8 +2610,8 @@ void CalcHydroConstraintForElems(Domain &domain, Index_t length,
       for (Index_t i = 0 ; i < length ; ++i) {
          Index_t_sim indx = regElemlist[i] ;
 
-         if (domain.vdov(indx) != Real_t_sim(0.)) {
-            Real_t_sim dtdvov = dvovmax / (FABS(domain.vdov(indx))+Real_t_sim(1.e-20)) ;
+         if (domain.vdov(indx) != Real_t(0.)) {
+            Real_t_sim dtdvov = dvovmax / (FABS(domain.vdov(indx))+Real_t(1.e-20)) ;
 
             if ( dthydro_tmp > dtdvov ) {
                   dthydro_tmp = dtdvov ;
