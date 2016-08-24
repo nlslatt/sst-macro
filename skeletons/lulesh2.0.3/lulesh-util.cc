@@ -224,11 +224,12 @@ void VerifyAndWriteFinalOutput(Real_t_sim elapsed_time,
 #if defined(LULESH_SST_MODS) && defined(LULESH_SST_SIM)
    printf("\nElapsed time         = %10.2f (s)\n", (Real_t)elapsed_time);
    printf("Grind time (us/z/c)  = %10.8g (per dom)  (%10.8g overall)\n", (Real_t)grindTime1, (Real_t)grindTime2);
+   printf("FOM                  = %10.8g (z/s)\n\n", (Real_t)(1000.0/grindTime2)); // zones per second
 #else
    printf("\nElapsed time         = %10.2f (s)\n", elapsed_time);
    printf("Grind time (us/z/c)  = %10.8g (per dom)  (%10.8g overall)\n", grindTime1, grindTime2);
-#endif
    printf("FOM                  = %10.8g (z/s)\n\n", 1000.0/grindTime2); // zones per second
+#endif
 
    return ;
 }
